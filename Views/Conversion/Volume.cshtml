@@ -1,0 +1,49 @@
+﻿@model UnitConverter.Models.ConversionViewModel
+
+@{
+    ViewData["Title"] = "Volume Conversion";
+}
+
+<h2>Volume Conversion</h2>
+
+<form asp-action="Convert" method="post">
+    <input type="hidden" asp-for="ConversionType" value="Volume" />
+    <div class="form-group">
+        <label asp-for="InputValue">Value</label>
+        <input asp-for="InputValue" class="form-control" type="number" step="any" min="0" />
+    </div>
+    <div class="form-group">
+        <label asp-for="FromUnit">From</label>
+        <select asp-for="FromUnit" class="form-control">
+            <option value="milliliter">Milliliter</option>
+            <option value="liter">Liter</option>
+            <option value="cubic_meter">Cubic Meter</option>
+            <option value="gallon">Gallon</option>
+            <option value="quart">Quart</option>
+            <option value="pint">Pint</option>
+            <option value="cup">Cup</option>
+            <option value="fluid_ounce">Fluid Ounce</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label asp-for="ToUnit">To</label>
+        <select asp-for="ToUnit" class="form-control">
+            <option value="milliliter">Milliliter</option>
+            <option value="liter">Liter</option>
+            <option value="cubic_meter">Cubic Meter</option>
+            <option value="gallon">Gallon</option>
+            <option value="quart">Quart</option>
+            <option value="pint">Pint</option>
+            <option value="cup">Cup</option>
+            <option value="fluid_ounce">Fluid Ounce</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Convert</button>
+</form>
+
+@if (Model.Result.HasValue)
+{
+    <div class="alert alert-success mt-3">
+        Result: @Model.Result.Value
+    </div>
+}

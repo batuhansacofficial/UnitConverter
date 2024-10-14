@@ -1,0 +1,51 @@
+﻿@model UnitConverter.Models.ConversionViewModel
+
+@{
+    ViewData["Title"] = "Area Conversion";
+}
+
+<h2>Area Conversion</h2>
+
+<form asp-action="Convert" method="post">
+    <input type="hidden" asp-for="ConversionType" value="Area" />
+    <div class="form-group">
+        <label asp-for="InputValue">Value</label>
+        <input asp-for="InputValue" class="form-control" type="number" step="any" min="0" />
+    </div>
+    <div class="form-group">
+        <label asp-for="FromUnit">From</label>
+        <select asp-for="FromUnit" class="form-control">
+            <option value="square_millimeter">Square Millimeter</option>
+            <option value="square_centimeter">Square Centimeter</option>
+            <option value="square_meter">Square Meter</option>
+            <option value="square_kilometer">Square Kilometer</option>
+            <option value="square_inch">Square Inch</option>
+            <option value="square_foot">Square Foot</option>
+            <option value="square_yard">Square Yard</option>
+            <option value="acre">Acre</option>
+            <option value="hectare">Hectare</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label asp-for="ToUnit">To</label>
+        <select asp-for="ToUnit" class="form-control">
+            <option value="square_millimeter">Square Millimeter</option>
+            <option value="square_centimeter">Square Centimeter</option>
+            <option value="square_meter">Square Meter</option>
+            <option value="square_kilometer">Square Kilometer</option>
+            <option value="square_inch">Square Inch</option>
+            <option value="square_foot">Square Foot</option>
+            <option value="square_yard">Square Yard</option>
+            <option value="acre">Acre</option>
+            <option value="hectare">Hectare</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Convert</button>
+</form>
+
+@if (Model.Result.HasValue)
+{
+    <div class="alert alert-success mt-3">
+        Result: @Model.Result.Value
+    </div>
+}

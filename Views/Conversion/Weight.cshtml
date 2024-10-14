@@ -1,0 +1,43 @@
+﻿@model UnitConverter.Models.ConversionViewModel
+
+@{
+    ViewData["Title"] = "Weight Conversion";
+}
+
+<h2>Weight Conversion</h2>
+
+<form asp-action="Convert" method="post">
+    <input type="hidden" asp-for="ConversionType" value="Weight" />
+    <div class="form-group">
+        <label asp-for="InputValue">Value</label>
+        <input asp-for="InputValue" class="form-control" type="number" step="any" min="0" />
+    </div>
+    <div class="form-group">
+        <label asp-for="FromUnit">From</label>
+        <select asp-for="FromUnit" class="form-control">
+            <option value="milligram">Milligram</option>
+            <option value="gram">Gram</option>
+            <option value="kilogram">Kilogram</option>
+            <option value="ounce">Ounce</option>
+            <option value="pound">Pound</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label asp-for="ToUnit">To</label>
+        <select asp-for="ToUnit" class="form-control">
+            <option value="milligram">Milligram</option>
+            <option value="gram">Gram</option>
+            <option value="kilogram">Kilogram</option>
+            <option value="ounce">Ounce</option>
+            <option value="pound">Pound</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Convert</button>
+</form>
+
+@if (Model.Result.HasValue)
+{
+    <div class="alert alert-success mt-3">
+        Result: @Model.Result.Value
+    </div>
+}

@@ -1,0 +1,39 @@
+﻿@model UnitConverter.Models.ConversionViewModel
+
+@{
+    ViewData["Title"] = "Temperature Conversion";
+}
+
+<h2>Temperature Conversion</h2>
+
+<form asp-action="Convert" method="post">
+    <input type="hidden" asp-for="ConversionType" value="Temperature" />
+    <div class="form-group">
+        <label asp-for="InputValue">Value</label>
+        <input asp-for="InputValue" class="form-control" type="number" step="any" min="0" />
+    </div>
+    <div class="form-group">
+        <label asp-for="FromUnit">From</label>
+        <select asp-for="FromUnit" class="form-control">
+            <option value="Celsius">Celsius</option>
+            <option value="Fahrenheit">Fahrenheit</option>
+            <option value="Kelvin">Kelvin</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label asp-for="ToUnit">To</label>
+        <select asp-for="ToUnit" class="form-control">
+            <option value="Celsius">Celsius</option>
+            <option value="Fahrenheit">Fahrenheit</option>
+            <option value="Kelvin">Kelvin</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Convert</button>
+</form>
+
+@if (Model.Result.HasValue)
+{
+    <div class="alert alert-success mt-3">
+        Result: @Model.Result.Value
+    </div>
+}
