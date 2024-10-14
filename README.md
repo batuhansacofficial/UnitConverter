@@ -20,9 +20,6 @@ Project Idea: https://roadmap.sh/projects/unit-converter
 ```bash
 git clone https://github.com/yourusername/unit-converter.git
 ```
-```bash
-cd unit-converter
-```
 
 ### Build and Run the Application
 
