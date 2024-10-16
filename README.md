@@ -18,7 +18,7 @@ Project Idea: https://roadmap.sh/projects/unit-converter
 
 ### Clone the Repository
 ```bash
-git clone https://github.com/yourusername/unit-converter.git
+git clone https://github.com/batuhansacofficial/UnitConverter.git
 ```
 
 ### Build and Run the Application
