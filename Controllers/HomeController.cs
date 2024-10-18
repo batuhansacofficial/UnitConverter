@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using UnitConverter.Models;
 
 namespace UnitConverter.Controllers;
 

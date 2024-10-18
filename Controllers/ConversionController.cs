@@ -5,40 +5,90 @@ namespace UnitConverter.Controllers
 {
     public class ConversionController : Controller
     {
+        private static readonly Dictionary<string, double> lengthConversionFactors = new Dictionary<string, double>
+        {
+            { "millimeter", 0.001 },
+            { "centimeter", 0.01 },
+            { "meter", 1 },
+            { "kilometer", 1000 },
+            { "inch", 0.0254 },
+            { "foot", 0.3048 },
+            { "yard", 0.9144 },
+            { "mile", 1609.34 }
+        };
+
+        private static readonly Dictionary<string, double> weightConversionFactors = new Dictionary<string, double>
+        {
+            { "milligram", 0.001 },
+            { "gram", 1 },
+            { "kilogram", 1000 },
+            { "ounce", 28.3495 },
+            { "pound", 453.592 }
+        };
+
+        private static readonly Dictionary<string, double> volumeConversionFactors = new Dictionary<string, double>
+        {
+            { "milliliter", 0.001 },
+            { "liter", 1 },
+            { "cubic_meter", 1000 },
+            { "gallon", 3.78541 },
+            { "quart", 0.946353 },
+            { "pint", 0.473176 },
+            { "cup", 0.24 },
+            { "fluid_ounce", 0.0295735 }
+        };
+
+        private static readonly Dictionary<string, double> areaConversionFactors = new Dictionary<string, double>
+        {
+            { "square_millimeter", 0.000001 },
+            { "square_centimeter", 0.0001 },
+            { "square_meter", 1 },
+            { "square_kilometer", 1000000 },
+            { "square_inch", 0.00064516 },
+            { "square_foot", 0.092903 },
+            { "square_yard", 0.836127 },
+            { "acre", 4046.86 },
+            { "hectare", 10000 }
+        };
+
+        public IActionResult Area()
+        {
+            return View(new ConversionViewModel { ConversionType = ConversionType.Area });
+        }
+        
         public IActionResult Length()
         {
-            return View(new ConversionViewModel { ConversionType = "Length" });
-        }
-
-        public IActionResult Weight()
-        {
-            return View(new ConversionViewModel { ConversionType = "Weight" });
+            return View(new ConversionViewModel { ConversionType = ConversionType.Length });
         }
 
         public IActionResult Temperature()
         {
-            return View(new ConversionViewModel { ConversionType = "Temperature" });
+            return View(new ConversionViewModel { ConversionType = ConversionType.Temperature });
         }
 
         public IActionResult Volume()
         {
-            return View(new ConversionViewModel { ConversionType = "Volume" });
+            return View(new ConversionViewModel { ConversionType = ConversionType.Volume });
         }
 
-        public IActionResult Area()
+        public IActionResult Weight()
         {
-            return View(new ConversionViewModel { ConversionType = "Area" });
+            return View(new ConversionViewModel { ConversionType = ConversionType.Weight });
         }
+
+
 
         [HttpPost]
         public IActionResult Convert(ConversionViewModel model)
         {
-            if (ModelState.IsValid)
             {
-                model.Result = ConvertUnits(model.InputValue, model.FromUnit, model.ToUnit, model.ConversionType);
-            }
+                if (ModelState.IsValid)
+                {
+                    model.Result = ConvertUnits(model.InputValue, model.FromUnit, model.ToUnit, model.ConversionType.ToString());
+                }
 
-            return View(model.ConversionType, model);
+                return View(model.ConversionType.ToString(), model);
+            }
         }
 
         private double? ConvertUnits(double inputValue, string fromUnit, string toUnit, string conversionType)
@@ -62,22 +112,10 @@ namespace UnitConverter.Controllers
 
         private double? ConvertLength(double inputValue, string fromUnit, string toUnit)
         {
-            var conversionFactors = new Dictionary<string, double>
+            if (lengthConversionFactors.TryGetValue(fromUnit, out double fromFactor) && lengthConversionFactors.TryGetValue(toUnit, out double toFactor))
             {
-                { "millimeter", 0.001 },
-                { "centimeter", 0.01 },
-                { "meter", 1 },
-                { "kilometer", 1000 },
-                { "inch", 0.0254 },
-                { "foot", 0.3048 },
-                { "yard", 0.9144 },
-                { "mile", 1609.34 }
-            };
-
-            if (conversionFactors.ContainsKey(fromUnit) && conversionFactors.ContainsKey(toUnit))
-            {
-                double valueInMeters = inputValue * conversionFactors[fromUnit];
-                return valueInMeters / conversionFactors[toUnit];
+                double valueInMeters = inputValue * fromFactor;
+                return valueInMeters / toFactor;
             }
 
             return null;
@@ -85,19 +123,10 @@ namespace UnitConverter.Controllers
 
         private double? ConvertWeight(double inputValue, string fromUnit, string toUnit)
         {
-            var conversionFactors = new Dictionary<string, double>
+            if (weightConversionFactors.TryGetValue(fromUnit, out double fromFactor) && weightConversionFactors.TryGetValue(toUnit, out double toFactor))
             {
-                { "milligram", 0.001 },
-                { "gram", 1 },
-                { "kilogram", 1000 },
-                { "ounce", 28.3495 },
-                { "pound", 453.592 }
-            };
-
-            if (conversionFactors.ContainsKey(fromUnit) && conversionFactors.ContainsKey(toUnit))
-            {
-                double valueInGrams = inputValue * conversionFactors[fromUnit];
-                return valueInGrams / conversionFactors[toUnit];
+                double valueInGrams = inputValue * fromFactor;
+                return valueInGrams / toFactor;
             }
 
             return null;
@@ -144,22 +173,10 @@ namespace UnitConverter.Controllers
 
         private double? ConvertVolume(double inputValue, string fromUnit, string toUnit)
         {
-            var conversionFactors = new Dictionary<string, double>
+            if (volumeConversionFactors.TryGetValue(fromUnit, out double fromFactor) && volumeConversionFactors.TryGetValue(toUnit, out double toFactor))
             {
-                { "milliliter", 0.001 },
-                { "liter", 1 },
-                { "cubic_meter", 1000 },
-                { "gallon", 3.78541 },
-                { "quart", 0.946353 },
-                { "pint", 0.473176 },
-                { "cup", 0.24 },
-                { "fluid_ounce", 0.0295735 }
-            };
-
-            if (conversionFactors.ContainsKey(fromUnit) && conversionFactors.ContainsKey(toUnit))
-            {
-                double valueInLiters = inputValue * conversionFactors[fromUnit];
-                return valueInLiters / conversionFactors[toUnit];
+                double valueInLiters = inputValue * fromFactor;
+                return valueInLiters / toFactor;
             }
 
             return null;
@@ -167,23 +184,10 @@ namespace UnitConverter.Controllers
 
         private double? ConvertArea(double inputValue, string fromUnit, string toUnit)
         {
-            var conversionFactors = new Dictionary<string, double>
+            if (areaConversionFactors.TryGetValue(fromUnit, out double fromFactor) && areaConversionFactors.TryGetValue(toUnit, out double toFactor))
             {
-                { "square_millimeter", 0.000001 },
-                { "square_centimeter", 0.0001 },
-                { "square_meter", 1 },
-                { "square_kilometer", 1000000 },
-                { "square_inch", 0.00064516 },
-                { "square_foot", 0.092903 },
-                { "square_yard", 0.836127 },
-                { "acre", 4046.86 },
-                { "hectare", 10000 }
-            };
-
-            if (conversionFactors.ContainsKey(fromUnit) && conversionFactors.ContainsKey(toUnit))
-            {
-                double valueInSquareMeters = inputValue * conversionFactors[fromUnit];
-                return valueInSquareMeters / conversionFactors[toUnit];
+                double valueInSquareMeters = inputValue * fromFactor;
+                return valueInSquareMeters / toFactor;
             }
 
             return null;
