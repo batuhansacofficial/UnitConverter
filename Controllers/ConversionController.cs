@@ -5,7 +5,7 @@ namespace UnitConverter.Controllers
 {
     public class ConversionController : Controller
     {
-        private static readonly Dictionary<string, double> lengthConversionFactors = new Dictionary<string, double>
+        private static readonly Dictionary<string, double> lengthConversionFactors = new()
         {
             { "millimeter", 0.001 },
             { "centimeter", 0.01 },
@@ -17,7 +17,7 @@ namespace UnitConverter.Controllers
             { "mile", 1609.34 }
         };
 
-        private static readonly Dictionary<string, double> weightConversionFactors = new Dictionary<string, double>
+        private static readonly Dictionary<string, double> weightConversionFactors = new()
         {
             { "milligram", 0.001 },
             { "gram", 1 },
@@ -26,7 +26,7 @@ namespace UnitConverter.Controllers
             { "pound", 453.592 }
         };
 
-        private static readonly Dictionary<string, double> volumeConversionFactors = new Dictionary<string, double>
+        private static readonly Dictionary<string, double> volumeConversionFactors = new()
         {
             { "milliliter", 0.001 },
             { "liter", 1 },
@@ -38,7 +38,7 @@ namespace UnitConverter.Controllers
             { "fluid_ounce", 0.0295735 }
         };
 
-        private static readonly Dictionary<string, double> areaConversionFactors = new Dictionary<string, double>
+        private static readonly Dictionary<string, double> areaConversionFactors = new()
         {
             { "square_millimeter", 0.000001 },
             { "square_centimeter", 0.0001 },
@@ -55,7 +55,7 @@ namespace UnitConverter.Controllers
         {
             return View(new ConversionViewModel { ConversionType = ConversionType.Area });
         }
-        
+
         public IActionResult Length()
         {
             return View(new ConversionViewModel { ConversionType = ConversionType.Length });
@@ -76,41 +76,37 @@ namespace UnitConverter.Controllers
             return View(new ConversionViewModel { ConversionType = ConversionType.Weight });
         }
 
-
-
         [HttpPost]
         public IActionResult Convert(ConversionViewModel model)
         {
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
-                {
-                    model.Result = ConvertUnits(model.InputValue, model.FromUnit, model.ToUnit, model.ConversionType.ToString());
-                }
-
-                return View(model.ConversionType.ToString(), model);
+                model.Result = ConvertUnits(model.InputValue, model.FromUnit, model.ToUnit, model.ConversionType);
             }
+
+            return View(model.ConversionType.ToString(), model);
         }
 
-        private double? ConvertUnits(double inputValue, string fromUnit, string toUnit, string conversionType)
+        public double? ConvertUnits(double inputValue, string fromUnit, string toUnit, ConversionType conversionType)
         {
             switch (conversionType)
             {
-                case "Length":
+                case ConversionType.Length:
                     return ConvertLength(inputValue, fromUnit, toUnit);
-                case "Weight":
+                case ConversionType.Weight:
                     return ConvertWeight(inputValue, fromUnit, toUnit);
-                case "Temperature":
+                case ConversionType.Temperature:
                     return ConvertTemperature(inputValue, fromUnit, toUnit);
-                case "Volume":
+                case ConversionType.Volume:
                     return ConvertVolume(inputValue, fromUnit, toUnit);
-                case "Area":
+                case ConversionType.Area:
                     return ConvertArea(inputValue, fromUnit, toUnit);
                 default:
                     return null;
             }
         }
 
-        private double? ConvertLength(double inputValue, string fromUnit, string toUnit)
+        public double? ConvertLength(double inputValue, string fromUnit, string toUnit)
         {
             if (lengthConversionFactors.TryGetValue(fromUnit, out double fromFactor) && lengthConversionFactors.TryGetValue(toUnit, out double toFactor))
             {
@@ -121,7 +117,7 @@ namespace UnitConverter.Controllers
             return null;
         }
 
-        private double? ConvertWeight(double inputValue, string fromUnit, string toUnit)
+        public double? ConvertWeight(double inputValue, string fromUnit, string toUnit)
         {
             if (weightConversionFactors.TryGetValue(fromUnit, out double fromFactor) && weightConversionFactors.TryGetValue(toUnit, out double toFactor))
             {
@@ -132,7 +128,7 @@ namespace UnitConverter.Controllers
             return null;
         }
 
-        private double? ConvertTemperature(double inputValue, string fromUnit, string toUnit)
+        public double? ConvertTemperature(double inputValue, string fromUnit, string toUnit)
         {
             if (fromUnit == toUnit)
             {
@@ -171,7 +167,7 @@ namespace UnitConverter.Controllers
             }
         }
 
-        private double? ConvertVolume(double inputValue, string fromUnit, string toUnit)
+        public double? ConvertVolume(double inputValue, string fromUnit, string toUnit)
         {
             if (volumeConversionFactors.TryGetValue(fromUnit, out double fromFactor) && volumeConversionFactors.TryGetValue(toUnit, out double toFactor))
             {
@@ -182,7 +178,7 @@ namespace UnitConverter.Controllers
             return null;
         }
 
-        private double? ConvertArea(double inputValue, string fromUnit, string toUnit)
+        public double? ConvertArea(double inputValue, string fromUnit, string toUnit)
         {
             if (areaConversionFactors.TryGetValue(fromUnit, out double fromFactor) && areaConversionFactors.TryGetValue(toUnit, out double toFactor))
             {

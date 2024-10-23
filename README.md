@@ -38,7 +38,6 @@ dotnet build
 dotnet run
 ```
 
-
 4. Open your browser and navigate to `https://localhost:7169` to see the application in action.
 
 ## Project Structure
