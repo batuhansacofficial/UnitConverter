@@ -12,7 +12,7 @@ Convert **length, weight, temperature, area and volume** through a responsive we
 | Stack | .NET 10 · ASP.NET Core Razor Pages + Minimal APIs · HTML/CSS/JavaScript |
 | Architecture | Web form and JSON endpoints call one stateless conversion service; one Docker container, no database or external conversion API |
 | Beyond the [project brief](https://roadmap.sh/projects/unit-converter) | Documented JSON API and Swagger UI; swap/copy; restore the last five conversions; formulas and rounding indicators |
-| Evidence | **85 passing tests** (57 domain, 28 HTTP); **95.5% application line coverage** snapshot; CI builds, tests and smoke-checks the non-root runtime image |
+| Evidence | **85 passing tests** (57 domain, 28 HTTP); **95.5% application line coverage** snapshot; CI builds, tests and smoke-checks the non-root runtime image; Render automatically deploys `main` after checks pass |
 
 The CI badge shows current workflow status. Coverage is a measured C#/Razor/API snapshot; JavaScript and CSS are excluded. [Reports and measurement scope](docs/verification.md#measured-coverage).
 

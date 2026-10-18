@@ -61,14 +61,16 @@ Each run publishes measured line, branch and conversion-domain coverage in its j
 
 ## Render deployment
 
-The current demo uses a free Docker web service in Frankfurt. Automatic deployment is off. To release a code change:
+The demo uses a free Docker web service in Frankfurt in the Hobby workspace. Render's **Auto-Deploy → After CI Checks Pass** setting watches the connected GitHub repository's `main` branch. To release a change:
 
-1. Push the intended revision to `main` and wait for its GitHub Actions run to pass.
-2. In the Render service dashboard, choose **Manual Deploy → Deploy latest commit** and confirm that the intended revision reaches the live state.
-3. Check `/health`, load the interface and Swagger UI, and submit `20 °C → °F` to verify a result of `68`. An API request converting Kelvin to Celsius with `value: "-1"` must return HTTP 400 validation.
+1. Push or merge the intended revision to `main`.
+2. GitHub Actions builds the solution, runs tests and coverage, and checks the runtime container. Render waits for the commit's CI checks, then builds and deploys it automatically. Failed or missing checks block the automatic deploy.
+3. Confirm that the matching commit reaches **Live** in Render. Check `/health`, load the interface and Swagger UI, and submit `20 °C → °F` to verify a result of `68`. An API request converting Kelvin to Celsius with `value: "-1"` must return HTTP 400 validation.
 
-Documentation-only changes do not require an application redeploy. See [hosted verification](verification.md#hosted-verification) for the recorded application revision and checks.
+The service uses Render's native GitHub integration; the workflow needs no deploy hook or Render API key. A passing CI run starts deployment; it does not by itself confirm that the new release is live. See [hosted verification](verification.md#hosted-verification) for recorded checks.
 
-[render.yaml](../render.yaml) is an optional Blueprint for provisioning a service with an HTTP `/health` check and automatic deployment after passing CI checks. It does not describe the existing manual service's settings exactly: the current service uses Render's default TCP readiness check. The Docker image listens on the port configured by `ASPNETCORE_HTTP_PORTS`, set to `10000` in the manifest.
+[render.yaml](../render.yaml) also specifies `autoDeployTrigger: checksPass`. It is an optional provisioning Blueprint rather than the source of the existing service's dashboard settings. The Blueprint specifies an HTTP `/health` check; the existing service uses Render's default TCP readiness check. The Docker image listens on the port configured by `ASPNETCORE_HTTP_PORTS`, set to `10000` in the manifest.
+
+Documentation changes also deploy by default. For a documentation-only commit that should skip deployment, include `[skip render]` in its commit message; GitHub CI still runs. The service watches only `main`, so feature-branch pushes do not update the public demo. [Render's deployment documentation](https://render.com/docs/deploys#integrating-with-ci) describes the check handling and skip options.
 
 Free services can sleep after inactivity, so the first request may wait for startup. [Render's free-service documentation](https://render.com/docs/free#spinning-down-on-idle) describes that behavior.
