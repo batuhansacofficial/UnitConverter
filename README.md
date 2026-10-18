@@ -96,7 +96,7 @@ Input uses a decimal point and no grouping separators; scientific notation is ac
 
 ## Deployment
 
-The live demo runs the non-root Docker image on a free Render service in Frankfurt. It was manually deployed after local verification; the [GitHub CI run](https://github.com/batuhansacofficial/UnitConverter/actions/runs/39172154459) also passed. To release a code change, wait for CI to pass and use Render's **Manual Deploy → Deploy latest commit**. Automatic deployment is currently off. `render.yaml` is an optional Blueprint configuration for a service that deploys after CI checks pass.
+The live demo runs the non-root Docker image on a free Render service in Frankfurt. It was manually deployed after verification and a [passing GitHub CI run](https://github.com/batuhansacofficial/UnitConverter/actions/runs/39172582288). To release a code change, wait for CI to pass and use Render's **Manual Deploy → Deploy latest commit**. Automatic deployment is currently off. `render.yaml` is an optional Blueprint configuration for a service that deploys after CI checks pass.
 
 See [verification](docs/verification.md) for the deployed source revision, hosted checks and environment boundaries.
 
