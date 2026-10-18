@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: unitwise-batuhansac
+    name: unitwise
     runtime: docker
     plan: free
     region: frankfurt

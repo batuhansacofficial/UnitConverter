@@ -1,10 +1,10 @@
 {
   "info": {
     "name": "Unitwise API",
-    "description": "Measurement conversion examples. Change baseUrl to use a local or hosted instance. Numeric values are JSON strings to preserve decimal precision.",
+    "description": "Measurement conversion examples. Change baseUrl to use a local or hosted instance. Measurement values are JSON strings to preserve decimal precision.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
-  "variable": [{ "key": "baseUrl", "value": "https://unitwise-batuhansac.onrender.com" }],
+  "variable": [{ "key": "baseUrl", "value": "https://unitwise.onrender.com" }],
   "item": [
     {
       "name": "List categories and units",

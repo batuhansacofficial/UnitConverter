@@ -2,6 +2,8 @@
 
 Unitwise is a small ASP.NET Core application with two entry points and one conversion engine. It uses Razor Pages for the interface and Minimal APIs for programmatic clients. Both call the same stateless service. No database or separate frontend build is required.
 
+Razor Pages keeps form rendering and server validation in one deployable application. The form remains usable without JavaScript, while optional enhancements add background updates, clipboard access and browser history. A shared conversion engine gives the page and API the same numeric rules and allows those rules to be tested directly. The last five conversions belong to the browser, so this feature needs no server-side persistence.
+
 ```mermaid
 flowchart LR
     Browser[Browser: HTML / CSS / JavaScript] --> Pages[Razor Pages]
@@ -39,19 +41,19 @@ flowchart LR
 | Tests | Domain reference values, boundaries, round trips and presentation; HTTP integration checks for API contracts, validation, Razor form flow and request protection |
 | CI | Restore, Release build, tests with Cobertura coverage, runtime image build and smoke test; reports uploaded as workflow artifacts |
 
-## Repository map
+## Source guide
 
-```text
-UnitConverter/
-  Conversion/     unit catalog, conversion rules, validation and formatting
-  Api/            JSON endpoint mapping and request/response contracts
-  Pages/          page handlers, forms, layout and error page
-  wwwroot/        self-hosted styles, scripts, font, Swagger UI and OpenAPI
-UnitConverter.Tests/  domain and HTTP integration tests
-.github/workflows/ci.yml
-Dockerfile
-render.yaml
-docs/             screenshots, Postman collection and verification notes
-```
+| Start here | Responsibility |
+| --- | --- |
+| [Program.cs](../UnitConverter/Program.cs) | Service registration, middleware and endpoint wiring |
+| [ConversionService.cs](../UnitConverter/Conversion/ConversionService.cs) and [UnitCatalog.cs](../UnitConverter/Conversion/UnitCatalog.cs) | Conversion rules, validation, formatting and unit definitions |
+| [ConversionEndpoints.cs](../UnitConverter/Api/ConversionEndpoints.cs) | JSON request/response contracts and ProblemDetails errors |
+| [Index.cshtml.cs](../UnitConverter/Pages/Index.cshtml.cs) and [Index.cshtml](../UnitConverter/Pages/Index.cshtml) | Page handlers, form and result rendering |
+| [site.js](../UnitConverter/wwwroot/js/site.js) and [site.css](../UnitConverter/wwwroot/css/site.css) | Optional browser interactions and responsive presentation |
+| [ConversionServiceTests.cs](../UnitConverter.Tests/ConversionServiceTests.cs) | Domain reference values, numeric boundaries and formatting tests |
+| [ConversionApiTests.cs](../UnitConverter.Tests/ConversionApiTests.cs) | HTTP API, native form and request-protection tests |
+| [CI workflow](../.github/workflows/ci.yml) and [Dockerfile](../Dockerfile) | Build, test, coverage and container delivery |
+
+See [local development and deployment](development.md) for commands and the distinction between the live Render service and the optional Blueprint.
 
 The OpenAPI contract is maintained explicitly and checked by integration tests. A future endpoint/schema change must update both the contract and its tests. This application intentionally has no database, user authentication, financial/currency conversions, or external conversion API.

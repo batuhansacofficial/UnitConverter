@@ -1,6 +1,6 @@
 # Verification
 
-Verified on **19 October 2026**, using the .NET 10 Linux SDK/runtime containers and the in-app Chromium browser.
+Verified on **19 October 2026**, using the .NET 10 Linux SDK/runtime containers and Chromium.
 
 ## Build and tests
 
@@ -36,8 +36,6 @@ These figures are a snapshot of the passing local Linux run. The repository cove
 - Checked the default desktop viewport, 1487 × 1058 desktop layout and 390 × 844 phone layout. No horizontal page overflow was present; the active category remained visible after navigation. Phone swap targets measured 44 × 44 CSS pixels.
 - Executed `POST /api/convert` through Swagger UI and received **HTTP 200**, including the expected exact numeric strings and formula. The console showed no application errors during the API check.
 
-Visual review inspected heading/control typography, the off-white/white/mint palette, category icons and selection state, form alignment/spacing, result hierarchy, the open history list and mobile reflow. The main copy and category order match the interface specification. Empty history, exact formulas, approximation/rounding notes and validation are deliberate functional states. Long result symbols wrap separately from numeric values to avoid clipping.
-
 The muted text color was darkened slightly after a palette contrast check. Against the mint result background, its calculated contrast increased from 4.42:1 to 4.55:1, meeting the 4.5:1 target for ordinary text. Other checked foreground/background pairs also exceeded 4.5:1; this check is limited to the inspected palette pairs.
 
 Manual browser checks complement the tests; they do not establish complete accessibility conformance or cross-browser coverage.
@@ -45,7 +43,7 @@ Manual browser checks complement the tests; they do not establish complete acces
 ## Screenshots
 
 - [Desktop interface](screenshots/desktop.jpg)
-- [Hosted interface](screenshots/live-demo.jpg)
+- [Hosted interface](screenshots/live-demo.png)
 - [Phone interface](screenshots/mobile.jpg)
 - [Phone result and history](screenshots/mobile-result.jpg)
 - [Swagger request](screenshots/swagger-request.jpg)
@@ -60,8 +58,8 @@ Windows Application Control blocked native application/test assembly loading wit
 ## Hosted verification
 
 - [GitHub Actions run 39172154459](https://github.com/batuhansacofficial/UnitConverter/actions/runs/39172154459) completed successfully, including Release build, 85 tests, coverage collection/report upload and non-root runtime container smoke checks. Downloaded CI reports independently confirmed 85 passed tests and the same line/branch coverage figures as the local Linux run.
-- Render deployment `dep-dbaki1k9v7es738smd60` reached **live**, deploying application source commit `1ce7844c3ad837a5f1c16164b0f2976bc1b75ff5` after [CI run 39172582288](https://github.com/batuhansacofficial/UnitConverter/actions/runs/39172582288) passed. This release includes the contrast correction; the browser confirmed the result text used `rgb(90, 114, 118)` and a new form submission returned 68 °F for 20 °C.
-- [Public demo](https://unitwise-batuhansac.onrender.com): the page loaded correctly, and a real form submission converted 20 °C to 68 °F. No browser application errors were observed during this hosted form check.
+- Render deployment `dep-dbalgjajnfac7386ba20` reached **live** on the free `unitwise` service (`srv-dbalgiqjnfac7386b8rg`), deploying source commit `15342d6bd66b00fac720f6837b5de61a9a0a14ee` after [CI run 39172800630](https://github.com/batuhansacofficial/UnitConverter/actions/runs/39172800630) passed. Application code is unchanged from `1ce7844c3ad837a5f1c16164b0f2976bc1b75ff5`, which includes the result-text contrast correction.
+- [Public demo](https://unitwise.onrender.com): the page loaded correctly, and a real form submission converted 20 °C to 68 °F and added a browser history entry. The hosted screenshot was captured from this hostname. The requested hostname was assigned to a replacement service because renaming the previous service retained its original hostname. The previous service is suspended.
 - Public HTTP checks: `/health` returned `healthy`; `/api/convert` returned `68` for 20 °C to °F; a Kelvin input of −1 returned HTTP 400 validation; `/swagger` and `/css/site.css` returned HTTP 200.
 - The service uses Render's **free** plan in Frankfurt. It currently uses manual deployment and the platform's default TCP readiness check. The `/health` HTTP endpoint is available; the optional `render.yaml` Blueprint specifies it as the health-check path and configures deployment after passing CI checks.
 - Documentation-only commits do not redeploy the application. Code releases are deployed manually after CI passes. Free services can sleep after inactivity; [Render documents the wake-up delay](https://render.com/docs/free#spinning-down-on-idle).

@@ -1,103 +1,69 @@
 # Unitwise — Unit Converter
 
 [![CI](https://github.com/batuhansacofficial/UnitConverter/actions/workflows/ci.yml/badge.svg)](https://github.com/batuhansacofficial/UnitConverter/actions/workflows/ci.yml)
-[![Application line coverage: 95.5%](docs/coverage.svg)](docs/verification.md)
+[![Application line coverage: 95.5% snapshot](docs/coverage.svg)](docs/verification.md#measured-coverage)
 
-A responsive ASP.NET Core application for converting **length, weight, temperature, area and volume**. One conversion engine powers both the web interface and a documented JSON API. No database, account or external conversion service is required.
+Convert **length, weight, temperature, area and volume** through a responsive web interface or JSON API. Unitwise combines a shared C# conversion engine with inline validation, formula explanations and browser-local history.
 
-**[Live demo](https://unitwise-batuhansac.onrender.com)** · **[Swagger UI](https://unitwise-batuhansac.onrender.com/swagger)** · **[Architecture](docs/architecture.md)** · **[Postman collection](docs/unitwise.postman_collection.json)** · **[CI and coverage](https://github.com/batuhansacofficial/UnitConverter/actions/workflows/ci.yml)**
+**[Live demo](https://unitwise.onrender.com)** · **[Swagger UI](https://unitwise.onrender.com/swagger)** · **[Architecture](docs/architecture.md)** · **[Postman collection](docs/unitwise.postman_collection.json)** · **[Verification](docs/verification.md)**
 
-The demo uses Render's free plan. After inactivity, the first load can take about a minute while the service wakes up. [Hosting details](https://render.com/docs/free#spinning-down-on-idle)
-
-## What to try in 60 seconds
-
-1. Convert `1 meter` to feet, then swap the units.
-2. Select Temperature: `20 °C` becomes `68 °F`; a value below absolute zero produces a field error.
-3. Copy a result or restore a recent conversion. The last five conversions stay in your browser and can be cleared.
-4. Open `/swagger` to send a real request and inspect its response, or import the Postman collection.
-
-![Desktop converter with a result and recent history](docs/screenshots/desktop.jpg)
-
-<details>
-<summary>Phone layout and Swagger screenshots</summary>
-
-<img src="docs/screenshots/mobile.jpg" width="300" alt="Phone layout with stacked unit controls and recent history" />
-<img src="docs/screenshots/mobile-result.jpg" width="300" alt="Phone result, formula and recent conversions" />
-
-![Swagger request](docs/screenshots/swagger-request.jpg)
-![Swagger live server response](docs/screenshots/swagger-response.jpg)
-
-</details>
-
-## Technical overview
-
-| Component | Implementation |
+| At a glance | Implementation |
 | --- | --- |
-| Backend | .NET 10, ASP.NET Core Razor Pages and Minimal APIs |
-| Frontend | Semantic HTML, responsive CSS, self-hosted Manrope, progressive JavaScript |
-| Conversion | Immutable unit catalog, exact rational intermediates, decimal results, explicit temperature offsets |
-| Validation | Numeric syntax and range, unit/category boundaries, absolute zero, overflow and underflow |
-| API | JSON success responses, ProblemDetails errors, OpenAPI 3.0 and self-hosted Swagger UI |
-| Verification | xUnit domain and HTTP integration tests; Cobertura coverage; container smoke checks |
-| Delivery | GitHub Actions, non-root Linux Docker image, free Render web service |
+| Stack | .NET 10 · ASP.NET Core Razor Pages + Minimal APIs · HTML/CSS/JavaScript |
+| Architecture | Web form and JSON endpoints call one stateless conversion service; one Docker container, no database or external conversion API |
+| Beyond the [project brief](https://roadmap.sh/projects/unit-converter) | Documented JSON API and Swagger UI; swap/copy; restore the last five conversions; formulas and rounding indicators |
+| Evidence | **85 passing tests** (57 domain, 28 HTTP); **95.5% application line coverage** snapshot; CI builds, tests and smoke-checks the non-root runtime image |
 
-The interface uses labeled native controls, visible keyboard focus, announced result/error states and a mobile layout. The conversion form works without JavaScript; browser history and clipboard are optional enhancements. See [architecture and decisions](docs/architecture.md) for the request flow and numeric boundaries.
+The CI badge shows current workflow status. Coverage is a measured C#/Razor/API snapshot; JavaScript and CSS are excluded. [Reports and measurement scope](docs/verification.md#measured-coverage).
+
+## Try it in 60 seconds
+
+1. Open the demo and convert **20 °C → 68 °F** under Temperature.
+2. Swap the units, copy a result, then restore a conversion from Recent history.
+3. Select **Kelvin** and enter `-1` to see absolute-zero validation, or send the same request through Swagger UI.
+
+Render's free service sleeps after inactivity; the first visit can take about a minute. The screenshots below show the working interface while it wakes up. [Hosting details](https://render.com/docs/free#spinning-down-on-idle).
+
+<img src="docs/screenshots/live-demo.png" width="720" alt="Hosted Unitwise interface converting 20 degrees Celsius to 68 degrees Fahrenheit, with a formula and recent history" />
+
+## Where to inspect the code
+
+- [Conversion engine](UnitConverter/Conversion/ConversionService.cs) and [unit catalog](UnitConverter/Conversion/UnitCatalog.cs): rational intermediates, decimal results, temperature offsets and range validation.
+- [JSON endpoints](UnitConverter/Api/ConversionEndpoints.cs) and [Razor page handler](UnitConverter/Pages/Index.cshtml.cs): two entry points using the same rules. API measurement values are strings to preserve decimal digits.
+- [Domain tests](UnitConverter.Tests/ConversionServiceTests.cs) and [HTTP integration tests](UnitConverter.Tests/ConversionApiTests.cs): reference values, round trips, boundaries, API contracts, form submission and antiforgery.
+
+The form works without JavaScript. Responsive layout, labeled controls, visible focus and announced result/error states support keyboard and phone use. History and clipboard are optional browser enhancements. See [architecture and tradeoffs](docs/architecture.md) for the request flow and numeric boundaries.
 
 ## Run locally
 
-Install the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0), then run from the repository root:
+Prerequisites: Git and the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
 
 ```sh
+git clone https://github.com/batuhansacofficial/UnitConverter.git
+cd UnitConverter
 dotnet run --project UnitConverter --launch-profile http
 ```
 
-Open **[http://localhost:5206](http://localhost:5206)**. Swagger UI is at **[http://localhost:5206/swagger](http://localhost:5206/swagger)**. There are no secrets, migrations or frontend package-install steps.
+Open **[localhost:5206](http://localhost:5206)** or **[local Swagger UI](http://localhost:5206/swagger)**. No secrets, migrations or frontend package installation are required.
 
-With Docker:
+With Docker, run these commands from the cloned repository instead:
 
 ```sh
 docker build -t unitwise .
 docker run --rm -p 127.0.0.1:5206:8080 unitwise
 ```
 
-## Tests and coverage
+Run the suite with `dotnet test --solution UnitConverter.slnx --configuration Release`. [Development instructions](docs/development.md) include coverage collection, Linux container tests and deployment. [Verification](docs/verification.md) records hosted checks and the native Windows execution limitation on the verification machine.
 
-```sh
-dotnet test --solution UnitConverter.slnx --configuration Release --results-directory TestResults -- --report-trx --report-trx-filename tests.trx --coverlet --coverlet-output-format cobertura --coverlet-include "[UnitConverter]*"
-```
+<details>
+<summary>Phone layout and Swagger request/response screenshots</summary>
 
-For a Linux container test run:
+<img src="docs/screenshots/mobile.jpg" width="300" alt="Phone layout with stacked unit controls and recent history" />
+<img src="docs/screenshots/mobile-result.jpg" width="300" alt="Phone result, formula and recent conversions" />
 
-```sh
-docker build --target test -t unitwise-tests .
-```
+![Swagger request](docs/screenshots/swagger-request.jpg)
+![Swagger HTTP 200 response from the running application](docs/screenshots/swagger-response.jpg)
 
-CI restores and builds the solution, runs tests and coverage, builds the runtime image, and smoke-tests its HTTP endpoints and non-root user. Every run publishes TRX and Cobertura files in the **test-results** artifact and summarizes measured line/branch coverage. The CI badge above reflects GitHub's actual workflow status.
+</details>
 
-**Verified locally in Linux:** 85 tests passed, 0 failed, 0 skipped. Measured application line coverage: **95.5%**; branch coverage: **90%**; conversion-domain line coverage: **97.14%**. The coverage badge is this measured snapshot; each CI run publishes its own reports. JavaScript and CSS are outside this measurement. See [verification and environment limits](docs/verification.md). Automated checks do not establish complete accessibility conformance.
-
-## API example
-
-`POST /api/convert` with `Content-Type: application/json`:
-
-```json
-{
-  "category": "temperature",
-  "from": "c",
-  "to": "f",
-  "value": "20",
-  "precision": 6
-}
-```
-
-The response includes `value: "68"`, `formattedValue: "68"`, unit symbols, a formula and `isRounded: false`. Numeric inputs and outputs are strings to preserve decimal digits in clients. `GET /api/categories` lists all valid units. The contract is at `/openapi/v1.json`; `/health` returns application readiness. The Postman collection targets the live demo; change `baseUrl` to `http://localhost:5206` for local requests.
-
-Input uses a decimal point and no grouping separators; scientific notation is accepted. Display defaults to six decimal places, or six significant digits for very small results. Recipe measures are explicitly **US** units; “Weight” represents mass. Conversion factors reference [NIST SP 811](https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b9).
-
-## Deployment
-
-The live demo runs the non-root Docker image on a free Render service in Frankfurt. It was manually deployed after verification and a [passing GitHub CI run](https://github.com/batuhansacofficial/UnitConverter/actions/runs/39172582288). To release a code change, wait for CI to pass and use Render's **Manual Deploy → Deploy latest commit**. Automatic deployment is currently off. `render.yaml` is an optional Blueprint configuration for a service that deploys after CI checks pass.
-
-See [verification](docs/verification.md) for the deployed source revision, hosted checks and environment boundaries.
-
-Inspired by the [roadmap.sh Unit Converter project](https://roadmap.sh/projects/unit-converter).
+Licensed under [MIT](LICENSE). Bundled [Manrope fonts](UnitConverter/wwwroot/fonts/OFL.txt) and [Swagger UI](UnitConverter/wwwroot/swagger/LICENSE) retain their upstream licenses and [dependency notices](UnitConverter/wwwroot/swagger/swagger-ui-bundle.js.LICENSE.txt).
