@@ -69,6 +69,8 @@ The demo uses a free Docker web service in Frankfurt in the Hobby workspace. Ren
 
 The service uses Render's native GitHub integration; the workflow needs no deploy hook or Render API key. A passing CI run starts deployment; it does not by itself confirm that the new release is live. See [hosted verification](verification.md#hosted-verification) for recorded checks.
 
+For a new service, choose **Git Provider** and select this repository through the connected GitHub account. A **Public Git Repository** URL alone supports manual deployment only. An existing service can connect its source through **Settings → Build → Source → Edit → Git Provider**; keep the branch as `main`, the runtime as Docker, and Auto-Deploy as **After CI Checks Pass**.
+
 [render.yaml](../render.yaml) also specifies `autoDeployTrigger: checksPass`. It is an optional provisioning Blueprint rather than the source of the existing service's dashboard settings. The Blueprint specifies an HTTP `/health` check; the existing service uses Render's default TCP readiness check. The Docker image listens on the port configured by `ASPNETCORE_HTTP_PORTS`, set to `10000` in the manifest.
 
 Documentation changes also deploy by default. For a documentation-only commit that should skip deployment, include `[skip render]` in its commit message; GitHub CI still runs. The service watches only `main`, so feature-branch pushes do not update the public demo. [Render's deployment documentation](https://render.com/docs/deploys#integrating-with-ci) describes the check handling and skip options.
