@@ -38,6 +38,8 @@ These figures are a snapshot of the passing local Linux run. The repository cove
 
 Visual review inspected heading/control typography, the off-white/white/mint palette, category icons and selection state, form alignment/spacing, result hierarchy, the open history list and mobile reflow. The main copy and category order match the interface specification. Empty history, exact formulas, approximation/rounding notes and validation are deliberate functional states. Long result symbols wrap separately from numeric values to avoid clipping.
 
+The muted text color was darkened slightly after a palette contrast check. Against the mint result background, its calculated contrast increased from 4.42:1 to 4.55:1, meeting the 4.5:1 target for ordinary text. Other checked foreground/background pairs also exceeded 4.5:1; this check is limited to the inspected palette pairs.
+
 Manual browser checks complement the tests; they do not establish complete accessibility conformance or cross-browser coverage.
 
 ## Screenshots
@@ -58,8 +60,8 @@ Windows Application Control blocked native application/test assembly loading wit
 ## Hosted verification
 
 - [GitHub Actions run 39172154459](https://github.com/batuhansacofficial/UnitConverter/actions/runs/39172154459) completed successfully, including Release build, 85 tests, coverage collection/report upload and non-root runtime container smoke checks. Downloaded CI reports independently confirmed 85 passed tests and the same line/branch coverage figures as the local Linux run.
-- Render deployment `dep-dbakeq0m7kps73974a40` reached **live**, deploying application source commit `f680feebaee574218a2870c2a698d9d775ab1612`.
+- Initial Render deployment `dep-dbakeq0m7kps73974a40` reached **live**, deploying application source commit `f680feebaee574218a2870c2a698d9d775ab1612`. Subsequent code releases use the same CI and hosted checks.
 - [Public demo](https://unitwise-batuhansac.onrender.com): the page loaded correctly, and a real form submission converted 20 °C to 68 °F. No browser application errors were observed during this hosted form check.
 - Public HTTP checks: `/health` returned `healthy`; `/api/convert` returned `68` for 20 °C to °F; a Kelvin input of −1 returned HTTP 400 validation; `/swagger` and `/css/site.css` returned HTTP 200.
 - The service uses Render's **free** plan in Frankfurt. It currently uses manual deployment and the platform's default TCP readiness check. The `/health` HTTP endpoint is available; the optional `render.yaml` Blueprint specifies it as the health-check path and configures deployment after passing CI checks.
-- Subsequent documentation/screenshot changes do not alter the deployed application code. Free services can sleep after inactivity; [Render documents the wake-up delay](https://render.com/docs/free#spinning-down-on-idle).
+- Documentation-only commits do not redeploy the application. Code releases are deployed manually after CI passes. Free services can sleep after inactivity; [Render documents the wake-up delay](https://render.com/docs/free#spinning-down-on-idle).
