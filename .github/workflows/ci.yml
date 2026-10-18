@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: 'true'
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+
+jobs:
+  build-and-test:
+    name: Build, test, and package
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore solution
+        run: dotnet restore UnitConverter.slnx
+
+      - name: Build solution
+        run: dotnet build UnitConverter.slnx --configuration Release --no-restore
+
+      - name: Test with coverage
+        run: >-
+          dotnet test --solution UnitConverter.slnx --configuration Release --no-build
+          --results-directory TestResults --
+          --report-trx --report-trx-filename tests.trx
+          --coverlet --coverlet-output-format cobertura --coverlet-include "[UnitConverter]*"
+
+      - name: Summarize measured coverage
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          reports = sorted(Path("TestResults").rglob("coverage.cobertura*.xml"))
+          if not reports:
+              raise SystemExit("Coverage collection did not produce a Cobertura report.")
+
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
+              summary.write("## Test coverage\n\n")
+              summary.write("Measured by the test suite in this run; browser interaction is not included.\n\n")
+              for report in reports:
+                  root = ET.parse(report).getroot()
+                  covered = int(root.get("lines-covered", 0))
+                  valid = int(root.get("lines-valid", 0))
+                  line_rate = 100 * covered / valid if valid else 0
+                  branch_rate = 100 * float(root.get("branch-rate", 0))
+                  summary.write(f"Application lines: **{line_rate:.2f}%** ({covered}/{valid}). ")
+                  summary.write(f"Application branches: **{branch_rate:.2f}%**.\n\n")
+
+                  domain_lines = {}
+                  for cls in root.findall(".//class"):
+                      filename = cls.get("filename", "").replace("\\", "/")
+                      if "/Conversion/" not in f"/{filename}":
+                          continue
+                      for line in cls.findall("./lines/line"):
+                          key = (filename, line.get("number"))
+                          domain_lines[key] = domain_lines.get(key, False) or int(line.get("hits", 0)) > 0
+                  if domain_lines:
+                      domain_covered = sum(domain_lines.values())
+                      domain_rate = 100 * domain_covered / len(domain_lines)
+                      summary.write(f"Conversion domain lines: **{domain_rate:.2f}%** ")
+                      summary.write(f"({domain_covered}/{len(domain_lines)}).\n\n")
+              summary.write("Download the `test-results` artifact for TRX results and Cobertura XML.\n")
+          PY
+
+      - name: Upload test results and coverage
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results
+          path: |
+            TestResults/**/*.trx
+            TestResults/**/coverage.cobertura*.xml
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Build runtime image
+        run: docker build --tag unitwise:ci .
+
+      - name: Smoke test runtime image
+        run: |
+          docker run --detach --name unitwise-ci --publish 127.0.0.1:8080:8080 unitwise:ci
+          curl --retry 12 --retry-all-errors --retry-delay 1 --fail --silent --show-error http://127.0.0.1:8080/ --output /tmp/unitwise.html
+          grep -q 'Length converter' /tmp/unitwise.html
+          curl --fail --silent --show-error http://127.0.0.1:8080/css/site.css --output /dev/null
+          curl --fail --silent --show-error http://127.0.0.1:8080/js/site.js --output /dev/null
+          test "$(docker exec unitwise-ci id -u)" != "0"
+
+      - name: Stop smoke test container
+        if: always()
+        run: |
+          if docker container inspect unitwise-ci >/dev/null 2>&1; then
+            docker logs unitwise-ci
+            docker rm --force unitwise-ci
+          fi

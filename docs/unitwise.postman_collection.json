@@ -1,0 +1,45 @@
+{
+  "info": {
+    "name": "Unitwise API",
+    "description": "Measurement conversion examples. Change baseUrl to use a local or hosted instance. Numeric values are JSON strings to preserve decimal precision.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [{ "key": "baseUrl", "value": "http://localhost:5206" }],
+  "item": [
+    {
+      "name": "List categories and units",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/categories" }
+    },
+    {
+      "name": "Convert meters to feet",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"category\": \"length\",\n  \"from\": \"m\",\n  \"to\": \"ft\",\n  \"value\": \"1\",\n  \"precision\": 6\n}", "options": { "raw": { "language": "json" } } },
+        "url": "{{baseUrl}}/api/convert"
+      }
+    },
+    {
+      "name": "Convert Celsius to Fahrenheit",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"category\": \"temperature\",\n  \"from\": \"c\",\n  \"to\": \"f\",\n  \"value\": \"20\"\n}", "options": { "raw": { "language": "json" } } },
+        "url": "{{baseUrl}}/api/convert"
+      }
+    },
+    {
+      "name": "Validate absolute zero (400)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"category\": \"temperature\",\n  \"from\": \"k\",\n  \"to\": \"c\",\n  \"value\": \"-1\"\n}", "options": { "raw": { "language": "json" } } },
+        "url": "{{baseUrl}}/api/convert"
+      }
+    },
+    {
+      "name": "Health",
+      "request": { "method": "GET", "url": "{{baseUrl}}/health" }
+    }
+  ]
+}

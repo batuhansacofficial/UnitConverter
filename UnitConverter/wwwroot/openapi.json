@@ -1,0 +1,144 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Unit Converter API",
+    "version": "1.0.0",
+    "description": "Stateless measurement conversions for length, weight, temperature, area, and volume. Unit IDs are case-sensitive. Volume measures labeled US use US customary definitions. Send numeric input as a string using a dot decimal separator and optional exponent, without grouping. Numeric result fields are strings so clients can preserve decimal precision. No authentication is required."
+  },
+  "paths": {
+    "/api/categories": {
+      "get": {
+        "operationId": "GetConversionCategories",
+        "summary": "List conversion categories and supported units",
+        "responses": {
+          "200": {
+            "description": "The available categories, default unit pairs, and public unit definitions.",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/ConversionCategory" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/convert": {
+      "post": {
+        "operationId": "ConvertMeasurement",
+        "summary": "Convert a measurement",
+        "description": "Length, weight, area, and volume must be nonnegative. Temperatures must be at or above absolute zero. Input must be exactly representable as a .NET decimal (up to 28 decimal places and 29 significant digits, magnitude at most 79228162514264337593543950335). Results outside the decimal range, including underflow to zero, produce a validation error. Fixed display precision uses midpoint rounding away from zero. Nonzero results that would display as zero use scientific notation with six significant digits.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ConversionRequest" },
+              "examples": {
+                "length": { "summary": "Miles to kilometers", "value": { "category": "length", "from": "mi", "to": "km", "value": "1", "precision": 6 } },
+                "temperature": { "summary": "Fahrenheit to Celsius", "value": { "category": "temperature", "from": "f", "to": "c", "value": "98.6", "precision": 2 } },
+                "scientificInput": { "summary": "Exponent input", "value": { "category": "length", "from": "mm", "to": "km", "value": "1e-3", "precision": 6 } }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The calculated value and its display representation. inputValue and value are exact decimal strings; formattedValue is intended for display and may be rounded.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ConversionResponse" },
+                "example": {
+                  "categoryId": "length", "fromId": "mi", "toId": "km", "inputValue": "1", "value": "1.609344", "formattedValue": "1.609344", "inputText": "1", "fromName": "Mile", "toName": "Kilometer", "fromSymbol": "mi", "toSymbol": "km", "formula": "km = mi × 1609.344 ÷ 1000", "isRounded": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid JSON, missing fields, an invalid category or unit, invalid numeric syntax or precision, an impossible measurement, or a result outside the decimal range. errors uses PascalCase keys: Category, From, To, Value, Precision, or Body.",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/ValidationProblem" },
+                "example": { "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1", "title": "Check the conversion request.", "status": 400, "errors": { "Value": ["Temperature cannot be below absolute zero (−273.15 °C, −459.67 °F, or 0 K)."] } }
+              }
+            }
+          },
+          "415": {
+            "description": "The request Content-Type is not application/json or a compatible +json media type.",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/ValidationProblem" },
+                "example": { "title": "Unsupported media type.", "status": 415, "detail": "Send the request with Content-Type: application/json.", "errors": { "Body": ["A JSON request body is required."] } }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ConversionRequest": {
+        "type": "object",
+        "required": ["category", "from", "to", "value"],
+        "properties": {
+          "category": { "type": "string", "enum": ["length", "weight", "temperature", "area", "volume"], "example": "length" },
+          "from": { "type": "string", "description": "A source unit ID from the selected category.", "example": "mi" },
+          "to": { "type": "string", "description": "A destination unit ID from the same category.", "example": "km" },
+          "value": { "type": "string", "maxLength": 128, "description": "Invariant numeric input, using a dot decimal separator and optional exponent; no grouping separators.", "example": "1" },
+          "precision": { "type": "integer", "minimum": 0, "maximum": 12, "default": 6, "description": "Maximum fixed decimal places in formattedValue. Tiny nonzero values use six-significant-digit scientific notation." }
+        }
+      },
+      "ConversionResponse": {
+        "type": "object",
+        "required": ["categoryId", "fromId", "toId", "inputValue", "value", "formattedValue", "inputText", "fromName", "toName", "fromSymbol", "toSymbol", "formula", "isRounded"],
+        "properties": {
+          "categoryId": { "type": "string", "example": "length" },
+          "fromId": { "type": "string", "example": "mi" },
+          "toId": { "type": "string", "example": "km" },
+          "inputValue": { "type": "string", "description": "Parsed input as an invariant decimal string, possibly using exponent notation.", "example": "1" },
+          "value": { "type": "string", "description": "Computed decimal value without display rounding, as an invariant numeric string. Nonterminating ratios are rounded to decimal precision.", "example": "1.609344" },
+          "formattedValue": { "type": "string", "description": "Display result with requested fixed precision, or scientific notation for tiny nonzero values.", "example": "1.609344" },
+          "inputText": { "type": "string", "description": "Original input with surrounding whitespace removed.", "example": "1" },
+          "fromName": { "type": "string", "example": "Mile" },
+          "toName": { "type": "string", "example": "Kilometer" },
+          "fromSymbol": { "type": "string", "example": "mi" },
+          "toSymbol": { "type": "string", "example": "km" },
+          "formula": { "type": "string", "description": "Human-readable conversion formula.", "example": "km = mi × 1609.344 ÷ 1000" },
+          "isRounded": { "type": "boolean", "description": "Whether the displayed result differs from the exact rational conversion.", "example": false }
+        }
+      },
+      "ConversionCategory": {
+        "type": "object",
+        "required": ["id", "name", "description", "defaultFrom", "defaultTo", "units"],
+        "properties": {
+          "id": { "type": "string", "example": "length" },
+          "name": { "type": "string", "example": "Length" },
+          "description": { "type": "string", "example": "From millimeters to miles." },
+          "defaultFrom": { "type": "string", "example": "m" },
+          "defaultTo": { "type": "string", "example": "ft" },
+          "units": { "type": "array", "items": { "$ref": "#/components/schemas/Unit" } }
+        }
+      },
+      "Unit": {
+        "type": "object",
+        "required": ["id", "name", "symbol"],
+        "properties": {
+          "id": { "type": "string", "example": "mi" },
+          "name": { "type": "string", "example": "Mile" },
+          "symbol": { "type": "string", "example": "mi" }
+        }
+      },
+      "ValidationProblem": {
+        "type": "object",
+        "required": ["title", "status", "errors"],
+        "properties": {
+          "type": { "type": "string", "format": "uri" },
+          "title": { "type": "string" },
+          "status": { "type": "integer", "example": 400 },
+          "detail": { "type": "string" },
+          "instance": { "type": "string" },
+          "errors": { "type": "object", "additionalProperties": { "type": "array", "items": { "type": "string" } } }
+        }
+      }
+    }
+  }
+}

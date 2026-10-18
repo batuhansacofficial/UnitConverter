@@ -1,0 +1,8 @@
+**/bin/
+**/obj/
+.vs/
+*.csproj.user
+TestResults/
+.qa/
+.env
+.env.*

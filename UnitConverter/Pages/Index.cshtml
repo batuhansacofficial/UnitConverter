@@ -1,0 +1,102 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = $"{Model.CurrentCategory.Name} converter";
+    var hasErrors = !ViewData.ModelState.IsValid;
+    string CategoryIcon(string id) => id switch { "length" => "ruler", "temperature" => "thermometer", _ => id };
+}
+<main id="main" class="container">
+    <section class="intro" aria-labelledby="page-title">
+        <h1 id="page-title">A little clarity. In every unit.</h1>
+        <p>Everyday conversions, without the extra steps.</p>
+    </section>
+    <div class="workspace">
+        <section class="converter-panel" data-workspace aria-label="Unit converter">
+            <nav class="category-nav" aria-label="Conversion category">
+                @foreach (var category in UnitCatalog.Categories)
+                {
+                    <a href="/?Category=@category.Id" class="category-link @(Model.CurrentCategory.Id == category.Id ? "is-active" : "")" aria-current="@(Model.CurrentCategory.Id == category.Id ? "page" : null)" data-category="@category.Id">
+                        <svg class="icon" aria-hidden="true"><use href="#icon-@CategoryIcon(category.Id)" /></svg><span>@category.Name</span>
+                    </a>
+                }
+            </nav>
+            <form method="post" class="converter-form" data-convert-form novalidate>
+                <input type="hidden" name="Category" value="@Model.Category" />
+                <div class="form-content">
+                    <div class="form-heading"><h2 tabindex="-1" data-category-heading>@Model.CurrentCategory.Name converter</h2><p>@Model.CurrentCategory.Description</p></div>
+                    @if (hasErrors)
+                    {
+                        <div class="validation-summary" role="alert" tabindex="-1" data-error-summary>
+                            <strong>Let's check that value.</strong>
+                            <div asp-validation-summary="All"></div>
+                        </div>
+                    }
+                    <div class="field value-field">
+                        <label for="Value">Value</label>
+                        <div class="value-input-wrap">
+                            <input id="Value" name="Value" type="text" inputmode="decimal" value="@Model.Value" maxlength="100" spellcheck="false" autocomplete="off" aria-describedby="value-hint value-error" aria-invalid="@(Model.FieldError("Value") is not null ? "true" : "false")" />
+                            <span id="value-hint">Use a decimal point</span>
+                        </div>
+                        <span class="field-error" id="value-error">@Model.FieldError("Value")</span>
+                    </div>
+                    <div class="unit-fields">
+                        <div class="field">
+                            <label for="From">From</label>
+                            <div class="select-wrap"><select id="From" name="From" aria-describedby="from-error" aria-invalid="@(Model.FieldError("From") is not null ? "true" : "false")">
+                                @foreach (var unit in Model.CurrentCategory.Units)
+                                {
+                                    <option value="@unit.Id" selected="@(Model.From == unit.Id)">@unit.Name (@unit.Symbol)</option>
+                                }
+                            </select><svg class="icon" aria-hidden="true"><use href="#icon-chevron" /></svg></div>
+                            <span class="field-error" id="from-error">@Model.FieldError("From")</span>
+                        </div>
+                        <button type="submit" asp-page-handler="Swap" class="swap-button" aria-label="Swap from and to units" title="Swap units"><svg class="icon" aria-hidden="true"><use href="#icon-swap" /></svg></button>
+                        <div class="field">
+                            <label for="To">To</label>
+                            <div class="select-wrap"><select id="To" name="To" aria-describedby="to-error" aria-invalid="@(Model.FieldError("To") is not null ? "true" : "false")">
+                                @foreach (var unit in Model.CurrentCategory.Units)
+                                {
+                                    <option value="@unit.Id" selected="@(Model.To == unit.Id)">@unit.Name (@unit.Symbol)</option>
+                                }
+                            </select><svg class="icon" aria-hidden="true"><use href="#icon-chevron" /></svg></div>
+                            <span class="field-error" id="to-error">@Model.FieldError("To")</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="primary-button convert-button"><span>Convert</span><svg class="icon" aria-hidden="true"><use href="#icon-arrow" /></svg></button>
+                </div>
+            </form>
+            <div class="result-wrapper" data-result-area>
+                @if (Model.Result is { } result)
+                {
+                    <section class="result-band" aria-label="Conversion result" data-history="@Model.HistoryJson" data-store="@Model.StoreResult.ToString().ToLowerInvariant()">
+                        <div class="result-main">
+                            <h3 class="small-label" data-result-label>Converted value</h3>
+                            <p class="result-number"><span data-result-value>@result.FormattedValue</span><span class="result-symbol">@result.ToSymbol</span></p>
+                            <p class="result-equation">@result.InputText @result.FromSymbol <span>@(result.IsRounded ? "≈" : "=")</span> @result.FormattedValue @result.ToSymbol</p>
+                            @if (result.IsRounded)
+                            {
+                                <p class="rounding-note">Rounded for display.</p>
+                            }
+                        </div>
+                        <button type="button" class="copy-button js-only" data-copy="@result.FormattedValue @result.ToSymbol"><svg class="icon" aria-hidden="true"><use href="#icon-copy" /></svg><span>Copy result</span></button>
+                    </section>
+                    <div class="formula"><h3 class="small-label">The formula</h3><p>@result.Formula</p></div>
+                }
+                else
+                {
+                    <section class="result-band result-empty" aria-label="Conversion result"><h3>One quick check, then you're ready.</h3><p>Correct the fields above and convert again.</p></section>
+                    <div class="formula"><p>Results and the formula will appear here.</p></div>
+                }
+            </div>
+        </section>
+        <aside class="history-rail" aria-labelledby="history-heading">
+            <section class="history-section">
+                <div class="history-heading"><h2 id="history-heading">Recent conversions</h2><button type="button" class="text-link js-only" data-clear-history disabled>Clear</button></div>
+                <p class="rail-caption" data-storage-note>Stored only in this browser.</p>
+                <div data-history-list class="history-list"><div class="empty-history"><svg class="icon" aria-hidden="true"><use href="#icon-restore" /></svg><p>Your next conversion starts here.</p><span>Convert a value to keep it close.</span></div></div>
+                <noscript><p class="rail-caption">Enable JavaScript to save recent conversions. The converter still works without it.</p></noscript>
+            </section>
+            <div class="everyday-note"><svg class="icon everyday-ruler" aria-hidden="true"><use href="#icon-brand" /></svg><h3>Made for the everyday.</h3><p>Compare a distance. Check a recipe.<br class="desktop-break" /> Make sense of a measurement.</p></div>
+        </aside>
+    </div>
+</main>

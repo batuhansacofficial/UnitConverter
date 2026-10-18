@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Convert length, weight, temperature, area and volume with clear results and useful formulas." />
+    <meta name="theme-color" content="#f7f8f6" />
+    <title>@(ViewData["Title"] ?? "Everyday unit converter") · Unitwise</title>
+    <link rel="icon" href="~/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="~/fonts/Manrope-Variable.ttf" as="font" type="font/ttf" crossorigin />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script src="~/js/site.js" asp-append-version="true" defer></script>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to converter</a>
+    <svg class="icon-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <symbol id="icon-ruler" viewBox="0 0 24 24"><path d="m3 16 13-13 5 5L8 21 3 16Z M6 13l2 2m1-5 3 3m0-6 2 2m1-5 3 3" /></symbol>
+        <symbol id="icon-brand" viewBox="0 0 32 24"><path d="M2 4h28v16H2z M6 4v6m5-6v4m5-4v6m5-6v4m5-4v6" /></symbol>
+        <symbol id="icon-weight" viewBox="0 0 24 24"><path d="M8.5 6.5a3.5 3.5 0 0 1 7 0 M6 6.5h12l2 14H4l2-14Z" /></symbol>
+        <symbol id="icon-thermometer" viewBox="0 0 24 24"><path d="M10 5a2 2 0 0 1 4 0v9.2a4 4 0 1 1-4 0V5Z M12 8v9m0 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z M16 7h2m-2 4h2" /></symbol>
+        <symbol id="icon-area" viewBox="0 0 24 24"><path stroke-dasharray="2.5 2.5" d="M3 3h18v18H3z" /></symbol>
+        <symbol id="icon-volume" viewBox="0 0 24 24"><path d="m12 2 9 5v10l-9 5-9-5V7l9-5Z M3 7l9 5 9-5 M12 12v10" /></symbol>
+        <symbol id="icon-swap" viewBox="0 0 24 24"><path d="M4 7h15m-4-4 4 4-4 4 M20 17H5m4-4-4 4 4 4" /></symbol>
+        <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6" /></symbol>
+        <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="7" width="12" height="14" rx="2" /><path d="M16 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h3" /></symbol>
+        <symbol id="icon-restore" viewBox="0 0 24 24"><path d="M4 4v6h6 M4.5 10a8 8 0 1 1-.2 5" /></symbol>
+        <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></symbol>
+        <symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></symbol>
+    </svg>
+    <header class="site-header container">
+        <a class="brand" href="/" aria-label="Unitwise home"><svg class="icon brand-icon" aria-hidden="true"><use href="#icon-brand" /></svg><span>unitwise</span></a>
+        <a class="text-link how-link" href="#how-it-works" data-open-help>How it works</a>
+    </header>
+    @RenderBody()
+    <footer class="site-footer container">
+        <span>A small tool. One less calculation.</span>
+        <span>5 categories <span aria-hidden="true">·</span> No sign-up</span>
+    </footer>
+    <dialog id="how-it-works" aria-labelledby="help-title">
+        <div class="dialog-heading"><h2 id="help-title">A few useful details.</h2><form method="dialog" asp-antiforgery="false" class="js-only"><button class="icon-button" aria-label="Close help"><svg class="icon" aria-hidden="true"><use href="#icon-close" /></svg></button></form></div>
+        <ol class="help-steps">
+            <li><strong>Choose your units.</strong> Pick a category, enter a value, and choose From and To. Use the swap button to reverse the units.</li>
+            <li><strong>Convert with context.</strong> Every result includes its formula. Displayed results round to six decimal places; very small values use scientific notation.</li>
+            <li><strong>Pick up where you left off.</strong> Your last five conversions stay in this browser. Select one to restore it, or use Clear to remove them.</li>
+        </ol>
+        <p>Use a decimal point (for example, 12.5), without thousands separators. Scientific notation such as 1e3 is also accepted. Temperature values represent absolute temperatures.</p>
+        <p>Weight means mass. Ounces and pounds are avoirdupois units. Recipe measures are explicitly US liquid units; US cups and gallons differ from Imperial measures.</p>
+        <p class="help-note">Conversions run on this server. There is no database, account, analytics, or third-party request from this page. Browser history is optional and depends on local storage being available.</p>
+        <a class="text-link" href="https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b9" target="_blank" rel="noopener noreferrer">Conversion reference: NIST <span class="sr-only">(opens in a new tab)</span></a>
+        <p class="no-js-only"><a class="text-link" href="#main">Back to converter</a></p>
+    </dialog>
+    <p class="sr-only" id="app-status" role="status" aria-live="polite" aria-atomic="true"></p>
+</body>
+</html>

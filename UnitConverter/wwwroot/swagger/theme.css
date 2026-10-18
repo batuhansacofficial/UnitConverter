@@ -1,0 +1,64 @@
+body {
+  margin: 0;
+  background: #f7f8f6;
+}
+.api-header {
+  font-family: system-ui, sans-serif;
+  background: #123e35;
+  color: #fff;
+  padding: 20px max(24px, calc((100% - 1460px) / 2));
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+}
+.api-header strong {
+  font-size: 23px;
+  letter-spacing: -0.6px;
+}
+.api-header span {
+  font-size: 14px;
+  letter-spacing: 0;
+  font-weight: 400;
+  opacity: 0.8;
+  margin-left: 14px;
+}
+.api-header a {
+  color: #fff;
+  font-size: 14px;
+  text-underline-offset: 4px;
+}
+.swagger-ui .info {
+  margin: 36px 0;
+}
+.swagger-ui .wrapper {
+  padding-bottom: 30px;
+}
+.swagger-ui .scheme-container {
+  background: #fff;
+}
+.swagger-ui .opblock.opblock-post {
+  background: #eaf4ef;
+  border-color: #147d64;
+}
+.swagger-ui .opblock.opblock-post .opblock-summary-method {
+  background: #147d64;
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid #147d64;
+  outline-offset: 3px;
+}
+@media (max-width: 550px) {
+  .api-header {
+    padding: 16px;
+    align-items: flex-start;
+  }
+  .api-header span {
+    display: block;
+    margin: 4px 0 0;
+  }
+  .api-header a {
+    font-size: 12px;
+  }
+}

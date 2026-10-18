@@ -1,0 +1,16 @@
+.git
+.github
+.vs
+.vscode
+.idea
+.qa
+**/bin
+**/obj
+**/TestResults
+**/*.csproj.user
+**/*.suo
+**/.env
+**/.env.*
+docs
+README.md
+TestResults

@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: unitwise-batuhansac
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: ASPNETCORE_HTTP_PORTS
+        value: "10000"
