@@ -63,3 +63,14 @@ Windows Application Control blocked native application/test assembly loading wit
 - Public HTTP checks: `/health` returned `healthy`; `/api/convert` returned `68` for 20 °C to °F; a Kelvin input of −1 returned HTTP 400 validation; `/swagger` and `/css/site.css` returned HTTP 200.
 - The service uses Render's **free** instance in Frankfurt. Automatic deployment is configured as **After CI Checks Pass** for the connected GitHub repository's `main` branch (`autoDeployTrigger: checksPass`). It uses the platform's default TCP readiness check; the optional `render.yaml` Blueprint specifies the available `/health` HTTP endpoint as its health-check path.
 - Future `main` commits deploy automatically after successful checks. Documentation-only commits can opt out with `[skip render]` while still running CI. Free services can sleep after inactivity; [Render documents the wake-up delay](https://render.com/docs/free#spinning-down-on-idle).
+
+## Automatic deployment verification
+
+On **19 October 2026**, the service's source was connected through the GitHub provider and Auto-Deploy was set to **After CI Checks Pass**. The workspace remained **Hobby** and the instance remained **free**.
+
+- Pushed commit [`6c9f1aa`](https://github.com/batuhansacofficial/UnitConverter/commit/6c9f1aa1fdb596669bd71a6d7a2f18784b006ad1) after connecting the provider. Render had no deployment for that commit while CI was running.
+- [GitHub Actions run 39178038155](https://github.com/batuhansacofficial/UnitConverter/actions/runs/39178038155) passed. Its build/test/package job completed at **02:49:22 UTC+03:00**.
+- Render automatically created deployment `dep-dbalm1flk1mc73d0ulng` for the same commit at **02:49:25 UTC+03:00**, with trigger **`new_commit`**, and reached **live** at **02:50:13 UTC+03:00**. This release did not require a manual deployment.
+- After the automatic release, the public page, Swagger and OpenAPI returned HTTP 200; `/health` returned `healthy`; the API returned `68` for 20 °C to °F and HTTP 400 for `-1` Kelvin.
+
+The native integration requires no Render deploy secret in GitHub Actions. The existing unconditional CI job remains the release gate; the application code and test suite were unchanged during this check.
