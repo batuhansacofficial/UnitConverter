@@ -43,14 +43,23 @@ Manual browser checks complement the tests; they do not establish complete acces
 ## Screenshots
 
 - [Desktop interface](screenshots/desktop.jpg)
+- [Hosted interface](screenshots/live-demo.jpg)
 - [Phone interface](screenshots/mobile.jpg)
+- [Phone result and history](screenshots/mobile-result.jpg)
 - [Swagger request](screenshots/swagger-request.jpg)
 - [Swagger server response](screenshots/swagger-response.jpg)
 
-Screenshots show the actual local application. History entries came from successful form submissions; the Swagger response came from the running server.
+Desktop, phone and Swagger screenshots show the actual local application; the hosted-interface screenshot shows the public Render service. History entries came from successful form submissions; the Swagger response came from the running server.
 
 ## Environment boundary
 
 Windows Application Control blocked native application/test assembly loading with `0x800711C7`. Final runtime and coverage verification therefore used Linux containers. No machine policy was changed. The Docker run is a real application/runtime check; it is separate from hosted deployment verification.
 
-Hosted deployment and CI run links are recorded in the README after they are verified.
+## Hosted verification
+
+- [GitHub Actions run 39172154459](https://github.com/batuhansacofficial/UnitConverter/actions/runs/39172154459) completed successfully, including Release build, 85 tests, coverage collection/report upload and non-root runtime container smoke checks. Downloaded CI reports independently confirmed 85 passed tests and the same line/branch coverage figures as the local Linux run.
+- Render deployment `dep-dbakeq0m7kps73974a40` reached **live**, deploying application source commit `f680feebaee574218a2870c2a698d9d775ab1612`.
+- [Public demo](https://unitwise-batuhansac.onrender.com): the page loaded correctly, and a real form submission converted 20 °C to 68 °F. No browser application errors were observed during this hosted form check.
+- Public HTTP checks: `/health` returned `healthy`; `/api/convert` returned `68` for 20 °C to °F; a Kelvin input of −1 returned HTTP 400 validation; `/swagger` and `/css/site.css` returned HTTP 200.
+- The service uses Render's **free** plan in Frankfurt. It currently uses manual deployment and the platform's default TCP readiness check. The `/health` HTTP endpoint is available; the optional `render.yaml` Blueprint specifies it as the health-check path and configures deployment after passing CI checks.
+- Subsequent documentation/screenshot changes do not alter the deployed application code. Free services can sleep after inactivity; [Render documents the wake-up delay](https://render.com/docs/free#spinning-down-on-idle).

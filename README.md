@@ -5,7 +5,9 @@
 
 A responsive ASP.NET Core application for converting **length, weight, temperature, area and volume**. One conversion engine powers both the web interface and a documented JSON API. No database, account or external conversion service is required.
 
-**Demo:** deployment verification in progress. · **[Architecture](docs/architecture.md)** · **[Postman collection](docs/unitwise.postman_collection.json)** · **[CI and coverage reports](https://github.com/batuhansacofficial/UnitConverter/actions/workflows/ci.yml)**
+**[Live demo](https://unitwise-batuhansac.onrender.com)** · **[Swagger UI](https://unitwise-batuhansac.onrender.com/swagger)** · **[Architecture](docs/architecture.md)** · **[Postman collection](docs/unitwise.postman_collection.json)** · **[CI and coverage](https://github.com/batuhansacofficial/UnitConverter/actions/workflows/ci.yml)**
+
+The demo uses Render's free plan. After inactivity, the first load can take about a minute while the service wakes up. [Hosting details](https://render.com/docs/free#spinning-down-on-idle)
 
 ## What to try in 60 seconds
 
@@ -20,6 +22,7 @@ A responsive ASP.NET Core application for converting **length, weight, temperatu
 <summary>Phone layout and Swagger screenshots</summary>
 
 <img src="docs/screenshots/mobile.jpg" width="300" alt="Phone layout with stacked unit controls and recent history" />
+<img src="docs/screenshots/mobile-result.jpg" width="300" alt="Phone result, formula and recent conversions" />
 
 ![Swagger request](docs/screenshots/swagger-request.jpg)
 ![Swagger live server response](docs/screenshots/swagger-response.jpg)
@@ -87,8 +90,14 @@ CI restores and builds the solution, runs tests and coverage, builds the runtime
 }
 ```
 
-The response includes `value: "68"`, `formattedValue: "68"`, unit symbols, a formula and `isRounded: false`. Numeric inputs and outputs are strings to preserve decimal digits in clients. `GET /api/categories` lists all valid units. The contract is at `/openapi/v1.json`; `/health` returns application readiness.
+The response includes `value: "68"`, `formattedValue: "68"`, unit symbols, a formula and `isRounded: false`. Numeric inputs and outputs are strings to preserve decimal digits in clients. `GET /api/categories` lists all valid units. The contract is at `/openapi/v1.json`; `/health` returns application readiness. The Postman collection targets the live demo; change `baseUrl` to `http://localhost:5206` for local requests.
 
 Input uses a decimal point and no grouping separators; scientific notation is accepted. Display defaults to six decimal places, or six significant digits for very small results. Recipe measures are explicitly **US** units; “Weight” represents mass. Conversion factors reference [NIST SP 811](https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b9).
+
+## Deployment
+
+The live demo runs the non-root Docker image on a free Render service in Frankfurt. It was manually deployed after local verification; the [GitHub CI run](https://github.com/batuhansacofficial/UnitConverter/actions/runs/39172154459) also passed. To release a code change, wait for CI to pass and use Render's **Manual Deploy → Deploy latest commit**. Automatic deployment is currently off. `render.yaml` is an optional Blueprint configuration for a service that deploys after CI checks pass.
+
+See [verification](docs/verification.md) for the deployed source revision, hosted checks and environment boundaries.
 
 Inspired by the [roadmap.sh Unit Converter project](https://roadmap.sh/projects/unit-converter).
